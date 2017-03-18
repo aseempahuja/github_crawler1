@@ -1,0 +1,8 @@
+python totalReposForTwitter.py
+
+### change line 143 headers your own User-Agent and Authorization
+
+### repo_twitter_copy*.py list all attributes of twitter repository.
+
+
+
