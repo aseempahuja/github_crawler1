@@ -6,11 +6,12 @@ from imp import reload
 import csv
 
 from totalReposForTwitter import listInformationForRepos
+import imp
 
 
 def main():
 
-        reload(sys)
+        imp.reload(sys)
 
         user_name = "hyperledger/"
 
@@ -28,10 +29,10 @@ def main():
 
                 isExists = os.path.exists(repo)
                 if not isExists:
-                    os.makedirs(repo)
-                     listInformationForRepos(user_name, repo, headers)
+                     os.makedirs(repo)
+                listInformationForRepos(user_name, repo, headers)
                      # a = random.uniform(1,2)
-                    time.sleep(0.1)
+                time.sleep(0.1)
 
         f.close()
 

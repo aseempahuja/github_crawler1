@@ -1,6 +1,5 @@
 # from repo_twitter_copy import *
 
-import requests
 import json
 import csv
 import collections
@@ -32,22 +31,22 @@ def writeDeployKeysToCSV(repo, deployKeys):  # write to csv
 
     write_header = True
 
-    for k, v in deployKeys.iteritems():
+    for k, v in list(deployKeys.items()):
 
         # if isinstance(v,basestring) == True:
         ##print v
         # v = unicodedata.normalize('NFKD',v).encode('ascii', 'ignore')
         # v=convert(v)#convert unicode to str and dict
 
-        if type(v) is not types.DictType:  # if it is not a dict
+        if type(v) is not dict:  # if it is not a dict
             ##print k,v
             if write_header:
                 item_keys.append(k)
             item_values.append(v)
         else:  # it is a dict
-
+#C:\Program Files (x86)\Python36-32\Tools\scripts
             ##print k,v
-            for innerkey, innervalue in v.iteritems():
+            for innerkey, innervalue in list(v.items()):
                 if write_header:
                     rowName = k + "/" + innerkey
                     item_keys.append(rowName)
@@ -98,23 +97,23 @@ def writeDeploymentsToCSV(repo, deployments):  # write to csv
 
         item_values = []
 
-        for k, v in singleDeployment.iteritems():
-            # v=convert(v)#convert unicode to str and dict
+        for k, v in list(singleDeployment.items()):
+            v=convert(v)#convert unicode to str and dict
 
-            # if type(v) == type(""):#if it is not a dict
-            # 	##print v
-            # 	if write_header:
-            # 		item_keys.append(k)
-            # 	item_values.append(v)
-            # else:#it is a dict
+            if type(v) == type(""):#if it is not a dict
+            	##print v
+            	if write_header:
+            		item_keys.append(k)
+            	item_values.append(v)
+            else:#it is a dict
 
-            # 	##print type(v)
-            # 	for innerkey, innervalue in v.iteritems():
-            # 		innervalue=convert(innervalue)
-            # 		if write_header:
-            # 			rowName=k+"/"+innerkey
-            # 			item_keys.append(rowName)
-            # 		item_values.append(innervalue)
+            	##print type(v)
+            	for innerkey, innervalue in v.items():
+            		innervalue=convert(innervalue)
+            		if write_header:
+            			rowName=k+"/"+innerkey
+            			item_keys.append(rowName)
+            		item_values.append(innervalue)
 
             if write_header:
                 item_keys.append(k)
@@ -168,13 +167,13 @@ def writeForksToCSV(repo, forks):  # write to csv
 
         item_values = []
 
-        for k, v in singleFork.iteritems():
+        for k, v in list(singleFork.items()):
             # if isinstance(v,basestring) == True:
             ##print v
             # v = unicodedata.normalize('NFKD',v).encode('ascii', 'ignore')
             # v=convert(v)#convert unicode to str and dict
 
-            if type(v) is not types.DictType:  # if it is not a dict
+            if type(v) is not dict:  # if it is not a dict
                 ##print k,v
                 if write_header:
                     item_keys.append(k)
@@ -182,21 +181,21 @@ def writeForksToCSV(repo, forks):  # write to csv
             else:  # it is a dict
 
                 ##print k,v
-                for innerkey, innervalue in v.iteritems():
-                    if type(innervalue) is not types.DictType:
+                for innerkey, innervalue in list(v.items()):
+                    if type(innervalue) is not dict:
                         if write_header:
                             rowName = k + "/" + innerkey
                             item_keys.append(rowName)
                         item_values.append(innervalue)
                     else:
-                        for innerinnerkey, innerinnervalue in innervalue.iteritems():  # invervalue is dict
-                            if type(innerinnervalue) is not types.DictType:
+                        for innerinnerkey, innerinnervalue in list(innervalue.items()):  # invervalue is dict
+                            if type(innerinnervalue) is not dict:
                                 if write_header:
                                     rowName = k + "/" + innerkey + "/" + innerinnerkey
                                     item_keys.append(rowName)
                                 item_values.append(innerinnervalue)
                             else:
-                                for innerinnerinnerkey, innerinnerinnervalue in innerinnervalue.iteritems():
+                                for innerinnerinnerkey, innerinnerinnervalue in list(innerinnervalue.items()):
                                     if write_header:
                                         rowName = k + "/" + innerkey + "/" + innerinnerkey + "/" + innerinnerinnerkey
                                         item_keys.append(rowName)

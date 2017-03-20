@@ -1,7 +1,6 @@
 # from repo_twitter_copy import *
 
 
-import requests
 import json
 import csv
 import collections
@@ -53,9 +52,9 @@ def writeReleasesToCSV(repo, releases):  # write to csv
 
         item_values = []
 
-        for k, v in singleRelease.iteritems():
+        for k, v in list(singleRelease.items()):
 
-            if type(v) is not types.DictType:  # if it is not a dict
+            if type(v) is not dict:  # if it is not a dict
                 ##print k,v
                 if write_header:
                     item_keys.append(k)
@@ -63,21 +62,21 @@ def writeReleasesToCSV(repo, releases):  # write to csv
             else:  # it is a dict
 
                 ##print k,v
-                for innerkey, innervalue in v.iteritems():
-                    if type(innervalue) is not types.DictType:
+                for innerkey, innervalue in list(v.items()):
+                    if type(innervalue) is not dict:
                         if write_header:
                             rowName = k + "/" + innerkey
                             item_keys.append(rowName)
                         item_values.append(innervalue)
                     else:
-                        for innerinnerkey, innerinnervalue in innervalue.iteritems():  # invervalue is dict
-                            if type(innerinnervalue) is not types.DictType:
+                        for innerinnerkey, innerinnervalue in list(innervalue.items()):  # invervalue is dict
+                            if type(innerinnervalue) is not dict:
                                 if write_header:
                                     rowName = k + "/" + innerkey + "/" + innerinnerkey
                                     item_keys.append(rowName)
                                 item_values.append(innerinnervalue)
                             else:
-                                for innerinnerinnerkey, innerinnerinnervalue in innerinnervalue.iteritems():
+                                for innerinnerinnerkey, innerinnerinnervalue in list(innerinnervalue.items()):
                                     if write_header:
                                         rowName = k + "/" + innerkey + "/" + innerinnerkey + "/" + innerinnerinnerkey
                                         item_keys.append(rowName)
@@ -129,9 +128,9 @@ def writeStatsToCSV(repo, stats):  # write to csv
 
         item_values = []
 
-        for k, v in singleStat.iteritems():
+        for k, v in list(singleStat.items()):
 
-            if type(v) is not types.DictType:  # if it is not a dict
+            if type(v) is not dict:  # if it is not a dict
                 ##print k,v
                 if write_header:
                     item_keys.append(k)
@@ -139,21 +138,21 @@ def writeStatsToCSV(repo, stats):  # write to csv
             else:  # it is a dict
 
                 ##print k,v
-                for innerkey, innervalue in v.iteritems():
-                    if type(innervalue) is not types.DictType:
+                for innerkey, innervalue in list(v.items()):
+                    if type(innervalue) is not dict:
                         if write_header:
                             rowName = k + "/" + innerkey
                             item_keys.append(rowName)
                         item_values.append(innervalue)
                     else:
-                        for innerinnerkey, innerinnervalue in innervalue.iteritems():  # invervalue is dict
-                            if type(innerinnervalue) is not types.DictType:
+                        for innerinnerkey, innerinnervalue in list(innervalue.items()):  # invervalue is dict
+                            if type(innerinnervalue) is not dict:
                                 if write_header:
                                     rowName = k + "/" + innerkey + "/" + innerinnerkey
                                     item_keys.append(rowName)
                                 item_values.append(innerinnervalue)
                             else:
-                                for innerinnerinnerkey, innerinnerinnervalue in innerinnervalue.iteritems():
+                                for innerinnerinnerkey, innerinnerinnervalue in list(innerinnervalue.items()):
                                     if write_header:
                                         rowName = k + "/" + innerkey + "/" + innerinnerkey + "/" + innerinnerinnerkey
                                         item_keys.append(rowName)
@@ -205,9 +204,9 @@ def writeStatsWeekToCSV(repo, statsWeek):  # write to csv
 
         item_values = []
 
-        for k, v in singleStatWeek.iteritems():
+        for k, v in list(singleStatWeek.items()):
 
-            if type(v) is not types.DictType:  # if it is not a dict
+            if type(v) is not dict:  # if it is not a dict
                 ##print k,v
                 if write_header:
                     item_keys.append(k)
@@ -215,21 +214,21 @@ def writeStatsWeekToCSV(repo, statsWeek):  # write to csv
             else:  # it is a dict
 
                 ##print k,v
-                for innerkey, innervalue in v.iteritems():
-                    if type(innervalue) is not types.DictType:
+                for innerkey, innervalue in list(v.items()):
+                    if type(innervalue) is not dict:
                         if write_header:
                             rowName = k + "/" + innerkey
                             item_keys.append(rowName)
                         item_values.append(innervalue)
                     else:
-                        for innerinnerkey, innerinnervalue in innervalue.iteritems():  # invervalue is dict
-                            if type(innerinnervalue) is not types.DictType:
+                        for innerinnerkey, innerinnervalue in list(innervalue.items()):  # invervalue is dict
+                            if type(innerinnervalue) is not dict:
                                 if write_header:
                                     rowName = k + "/" + innerkey + "/" + innerinnerkey
                                     item_keys.append(rowName)
                                 item_values.append(innerinnervalue)
                             else:
-                                for innerinnerinnerkey, innerinnerinnervalue in innerinnervalue.iteritems():
+                                for innerinnerinnerkey, innerinnerinnervalue in list(innerinnervalue.items()):
                                     if write_header:
                                         rowName = k + "/" + innerkey + "/" + innerinnerkey + "/" + innerinnerinnerkey
                                         item_keys.append(rowName)
@@ -299,8 +298,8 @@ def writeWeekAllOwnerToCSV(repo, weekAllOwner):
     item_keys = []
     item_values = []
 
-    f.writerow(weekAllOwner.keys())
-    f.writerow(weekAllOwner.values())
+    f.writerow(list(weekAllOwner.keys()))
+    f.writerow(list(weekAllOwner.values()))
 
 
 def listHourDayCommits(user_name, repos, headers):

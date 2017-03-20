@@ -7,14 +7,15 @@ from repo_twitter5_copy import *
 import time
 import random
 import os
+import imp
 
 # get all the information on repositories
 
 def listInformationForRepos(user_name, repo, headers):
-    print "Hello_listInformationForRepos"
+    print("Hello_listInformationForRepos")
     #fetching contributors from
     contributors = listContributors(user_name, repo, headers)
-    print contributors
+    print(contributors)
     writeContributorsToCSV(repo, contributors)
 
     # tags = listTags(user_name, repo, headers)
@@ -134,7 +135,7 @@ def listInformationForRepos(user_name, repo, headers):
 
 
 def main():
-    reload(sys)
+    imp.reload(sys)
     sys.setdefaultencoding("utf-8")
 
     user_name = "hyperledger/"
@@ -148,7 +149,7 @@ def main():
     for row in reader:
         count = count + 1
         repo = row[0]
-        print repo, count
+        print((repo, count))
 
         isExists = os.path.exists(repo)
         if not isExists:

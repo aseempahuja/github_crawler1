@@ -1,4 +1,4 @@
-import requests
+import urllib.request
 import json
 import csv
 import collections
@@ -9,15 +9,16 @@ import sys
 import time
 import random
 import os
+import imp
 
 
 def convert(data):  # unicode to dict
-    if isinstance(data, basestring):
+    if isinstance(data, str):
         return str(data)
     elif isinstance(data, collections.Mapping):
-        return dict(map(convert, data.iteritems()))
+        return dict(list(map(convert, iter(list(data.items())))))
     elif isinstance(data, collections.Iterable):
-        return type(data)(map(convert, data))
+        return type(data)(list(map(convert, data)))
     else:
         return data
 
@@ -71,11 +72,11 @@ def writeRepoBasicInfoToCSV(repos):  # write to csv
 
         item_values = []
 
-        for j in range(len(singleRepo.keys())):
+        for j in range(len(list(singleRepo.keys()))):
 
             if write_header:
-                item_keys.append(singleRepo.keys()[j])
-            value = singleRepo.get(singleRepo.keys()[j])
+                item_keys.append(list(singleRepo.keys())[j])
+            value = singleRepo.get(list(singleRepo.keys())[j])
             item_values.append(value)
 
         if write_header:
@@ -86,6 +87,7 @@ def writeRepoBasicInfoToCSV(repos):  # write to csv
 
 
 def listContributors(user_name, repos, headers):
+    print("in list contributors")
     data = []
 
     page_n = 100
@@ -95,10 +97,16 @@ def listContributors(user_name, repos, headers):
         # a = random.uniform(1,2)
         time.sleep(1)
 #made changes here on march 20
-        file_name = "http://api.github.com/repos/" + user_name + "/contributors" % (repos, j)
-        repo_contributors = requests.get("https://api.github.com/repos/hyperledger/fabric/contributors", headers=headers)
+        #file_name = "http://api.github.com/repos/" + user_name + "/contributors" % (repos, j)
+        file_name = "https://api.github.com/repos/hyperledger/fabric/contributors"
+        webURL=urllib.request.urlopen(file_name)
+        r_data=webURL.read()
+        encoding = webURL.info().get_content_charset('utf-8')
+
+
+        #repo_contributors = requests.get("https://api.github.com/repos/hyperledger/fabric/contributors", headers=headers)
         # print repo_contributors, j#if success(200)
-        raw_data = json.loads(repo_contributors.text)
+        raw_data = json.loads(r_data.decode(encoding))
         print(raw_data)
         page_n = len(raw_data)
         for k in range(page_n):
@@ -127,11 +135,11 @@ def writeContributorsToCSV(repo, contributors):  # write to csv
 
         item_values = []
 
-        for j in range(len(singleContributor.keys())):
+        for j in range(len(list(singleContributor.keys()))):
 
             if write_header:
-                item_keys.append(singleContributor.keys()[j])
-            value = singleContributor.get(singleContributor.keys()[j])
+                item_keys.append(list(singleContributor.keys())[j])
+            value = singleContributor.get(list(singleContributor.keys())[j])
             item_values.append(value)
 
         if write_header:
@@ -178,7 +186,7 @@ def writeTagsToCSV(repo, tags):  # write to csv
 
         item_values = []
 
-        for k, v in singleTag.iteritems():
+        for k, v in list(singleTag.items()):
             v = convert(v)  # convert unicode to str and dict
 
             if type(v) == type(""):  # if it is not a dict
@@ -189,7 +197,7 @@ def writeTagsToCSV(repo, tags):  # write to csv
             else:  # it is a dict
 
                 ##print type(v)
-                for innerkey, innervalue in v.iteritems():
+                for innerkey, innervalue in list(v.items()):
                     if write_header:
                         rowName = k + "/" + innerkey
                         item_keys.append(rowName)
@@ -237,7 +245,7 @@ def writeBranchesToCSV(repo, branches):  # write to csv
 
         item_values = []
 
-        for k, v in singleBranch.iteritems():
+        for k, v in list(singleBranch.items()):
             v = convert(v)  # convert unicode to str and dict
 
             if type(v) == type(""):  # if it is not a dict
@@ -248,7 +256,7 @@ def writeBranchesToCSV(repo, branches):  # write to csv
             else:  # it is a dict
 
                 ##print type(v)
-                for innerkey, innervalue in v.iteritems():
+                for innerkey, innervalue in list(v.items()):
                     if write_header:
                         rowName = k + "/" + innerkey
                         item_keys.append(rowName)
@@ -296,13 +304,13 @@ def writePullsToCSV(repo, pulls):  # write to csv
 
         item_values = []
 
-        for k, v in singlePull.iteritems():
+        for k, v in list(singlePull.items()):
             # if isinstance(v,basestring) == True:
             ##print v
             # v = unicodedata.normalize('NFKD',v).encode('ascii', 'ignore')
             # v=convert(v)#convert unicode to str and dict
 
-            if type(v) is not types.DictType:  # if it is not a dict
+            if type(v) is not dict:  # if it is not a dict
                 ##print k,v
                 if write_header:
                     item_keys.append(k)
@@ -310,21 +318,21 @@ def writePullsToCSV(repo, pulls):  # write to csv
             else:  # it is a dict
 
                 ##print k,v
-                for innerkey, innervalue in v.iteritems():
-                    if type(innervalue) is not types.DictType:
+                for innerkey, innervalue in list(v.items()):
+                    if type(innervalue) is not dict:
                         if write_header:
                             rowName = k + "/" + innerkey
                             item_keys.append(rowName)
                         item_values.append(innervalue)
                     else:
-                        for innerinnerkey, innerinnervalue in innervalue.iteritems():  # invervalue is dict
-                            if type(innerinnervalue) is not types.DictType:
+                        for innerinnerkey, innerinnervalue in list(innervalue.items()):  # invervalue is dict
+                            if type(innerinnervalue) is not dict:
                                 if write_header:
                                     rowName = k + "/" + innerkey + "/" + innerinnerkey
                                     item_keys.append(rowName)
                                 item_values.append(innerinnervalue)
                             else:
-                                for innerinnerinnerkey, innerinnerinnervalue in innerinnervalue.iteritems():
+                                for innerinnerinnerkey, innerinnerinnervalue in list(innerinnervalue.items()):
                                     if write_header:
                                         rowName = k + "/" + innerkey + "/" + innerinnerkey + "/" + innerinnerinnerkey
                                         item_keys.append(rowName)
@@ -373,9 +381,9 @@ def writeCommentsToCSV(repo, comments):  # write to csv
 
         item_values = []
 
-        for k, v in singleComment.iteritems():
+        for k, v in list(singleComment.items()):
 
-            if type(v) is not types.DictType:  # if it is not a dict
+            if type(v) is not dict:  # if it is not a dict
                 ##print k,v
                 if write_header:
                     item_keys.append(k)
@@ -383,21 +391,21 @@ def writeCommentsToCSV(repo, comments):  # write to csv
             else:  # it is a dict
 
                 ##print k,v
-                for innerkey, innervalue in v.iteritems():
-                    if type(innervalue) is not types.DictType:
+                for innerkey, innervalue in list(v.items()):
+                    if type(innervalue) is not dict:
                         if write_header:
                             rowName = k + "/" + innerkey
                             item_keys.append(rowName)
                         item_values.append(innervalue)
                     else:
-                        for innerinnerkey, innerinnervalue in innervalue.iteritems():  # invervalue is dict
-                            if type(innerinnervalue) is not types.DictType:
+                        for innerinnerkey, innerinnervalue in list(innervalue.items()):  # invervalue is dict
+                            if type(innerinnervalue) is not dict:
                                 if write_header:
                                     rowName = k + "/" + innerkey + "/" + innerinnerkey
                                     item_keys.append(rowName)
                                 item_values.append(innerinnervalue)
                             else:
-                                for innerinnerinnerkey, innerinnerinnervalue in innerinnervalue.iteritems():
+                                for innerinnerinnerkey, innerinnerinnervalue in list(innerinnervalue.items()):
                                     if write_header:
                                         rowName = k + "/" + innerkey + "/" + innerinnerkey + "/" + innerinnerinnerkey
                                         item_keys.append(rowName)
@@ -445,13 +453,13 @@ def writeCommitsToCSV(repo, commits):  # write to csv
 
         item_values = []
 
-        for k, v in singleCommit.iteritems():
+        for k, v in list(singleCommit.items()):
             # if isinstance(v,basestring) == True:
             ##print v
             # v = unicodedata.normalize('NFKD',v).encode('ascii', 'ignore')
             # v=convert(v)#convert unicode to str and dict
 
-            if type(v) is not types.DictType:  # if it is not a dict
+            if type(v) is not dict:  # if it is not a dict
                 ##print k,v
                 if write_header:
                     item_keys.append(k)
@@ -459,21 +467,21 @@ def writeCommitsToCSV(repo, commits):  # write to csv
             else:  # it is a dict
 
                 ##print k,v
-                for innerkey, innervalue in v.iteritems():
-                    if type(innervalue) is not types.DictType:
+                for innerkey, innervalue in list(v.items()):
+                    if type(innervalue) is not dict:
                         if write_header:
                             rowName = k + "/" + innerkey
                             item_keys.append(rowName)
                         item_values.append(innervalue)
                     else:
-                        for innerinnerkey, innerinnervalue in innervalue.iteritems():  # invervalue is dict
-                            if type(innerinnervalue) is not types.DictType:
+                        for innerinnerkey, innerinnervalue in list(innervalue.items()):  # invervalue is dict
+                            if type(innerinnervalue) is not dict:
                                 if write_header:
                                     rowName = k + "/" + innerkey + "/" + innerinnerkey
                                     item_keys.append(rowName)
                                 item_values.append(innerinnervalue)
                             else:
-                                for innerinnerinnerkey, innerinnerinnervalue in innerinnervalue.iteritems():
+                                for innerinnerinnerkey, innerinnerinnervalue in list(innerinnervalue.items()):
                                     if write_header:
                                         rowName = k + "/" + innerkey + "/" + innerinnerkey + "/" + innerinnerinnerkey
                                         item_keys.append(rowName)
@@ -503,14 +511,14 @@ def writeContentsToCSV(repo, contents):  # write to csv
 
     write_header = True
 
-    for k, v in contents.iteritems():
+    for k, v in list(contents.items()):
 
         # if isinstance(v,basestring) == True:
         ##print v
         # v = unicodedata.normalize('NFKD',v).encode('ascii', 'ignore')
         # v=convert(v)#convert unicode to str and dict
 
-        if type(v) is not types.DictType:  # if it is not a dict
+        if type(v) is not dict:  # if it is not a dict
             ##print k,v
             if write_header:
                 item_keys.append(k)
@@ -518,7 +526,7 @@ def writeContentsToCSV(repo, contents):  # write to csv
         else:  # it is a dict
 
             ##print k,v
-            for innerkey, innervalue in v.iteritems():
+            for innerkey, innervalue in list(v.items()):
                 if write_header:
                     rowName = k + "/" + innerkey
                     item_keys.append(rowName)
@@ -530,7 +538,7 @@ def writeContentsToCSV(repo, contents):  # write to csv
 
 
 def main():
-    reload(sys)
+    imp.reload(sys)
     sys.setdefaultencoding("utf-8")
     user_name = 'hyperledger/cello/'
     repos, reposNames = listAllReposNames(user_name)
