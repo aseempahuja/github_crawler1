@@ -1,4 +1,4 @@
-#from repo_twitter_copy import *
+# from repo_twitter_copy import *
 
 import requests
 import json
@@ -13,216 +13,205 @@ import random
 import os
 
 
+def listDeployKeys(user_name, repos, headers):
+    # a = random.uniform(1,2)
+    time.sleep(0.1)
 
-def listDeployKeys(user_name,repos,headers):
-	#a = random.uniform(1,2)
-	time.sleep(0.1)
+    file_name = "http://api.github.com/repos/" + user_name + "%s/keys?per_page=100" % repos
+    repo_DeployKeys = requests.get(file_name, headers=headers)
+    # print repo_DeployKeys
+    raw_data = json.loads(repo_DeployKeys.text)
 
-	file_name="http://api.github.com/repos/"+user_name+"%s/keys?per_page=100" % repos
-	repo_DeployKeys = requests.get(file_name, headers=headers)
-	#print repo_DeployKeys
-	raw_data=json.loads(repo_DeployKeys.text)
-
-	return raw_data
-
-
-def writeDeployKeysToCSV(repo,deployKeys):#write to csv
-	f = csv.writer(open(repo+"/"+repo+"ReposDeployKeys.csv", "wb+"))
-	item_keys    = []
-	item_values = []
+    return raw_data
 
 
-	write_header=True
+def writeDeployKeysToCSV(repo, deployKeys):  # write to csv
+    f = csv.writer(open(repo + "/" + repo + "ReposDeployKeys.csv", "wb+"))
+    item_keys = []
+    item_values = []
 
-	for k , v in deployKeys.iteritems():
+    write_header = True
 
-			#if isinstance(v,basestring) == True:
-				##print v
-				#v = unicodedata.normalize('NFKD',v).encode('ascii', 'ignore')
-				#v=convert(v)#convert unicode to str and dict
-		 	
-		if type(v) is not  types.DictType:#if it is not a dict
-		 		##print k,v
-		 	if write_header:
-		 		item_keys.append(k)
-		 	item_values.append(v)
-		else:#it is a dict
+    for k, v in deployKeys.iteritems():
 
-		 		##print k,v
-		 	for innerkey, innervalue in v.iteritems():
-				if write_header:
-		 			rowName=k+"/"+innerkey
-		 			item_keys.append(rowName)	
-		 		item_values.append(innervalue)
-		 									
+        # if isinstance(v,basestring) == True:
+        ##print v
+        # v = unicodedata.normalize('NFKD',v).encode('ascii', 'ignore')
+        # v=convert(v)#convert unicode to str and dict
 
-	if write_header:
-		f.writerow(item_keys)
-	f.writerow(item_values)
+        if type(v) is not types.DictType:  # if it is not a dict
+            ##print k,v
+            if write_header:
+                item_keys.append(k)
+            item_values.append(v)
+        else:  # it is a dict
 
+            ##print k,v
+            for innerkey, innervalue in v.iteritems():
+                if write_header:
+                    rowName = k + "/" + innerkey
+                    item_keys.append(rowName)
+                item_values.append(innervalue)
 
-
-def listDeployment(user_name,repos,headers):
-	#request = requests.get("https://api.github.com/repos/twitter/typeahead.js/contributors?per_page=100")
-	#data=json.loads(request.text)
-	#len(data)	
-
-	data=[]
-
-	page_n=100
-	j=1
-
-	while page_n == 100:
-		#a = random.uniform(1,2)
-		time.sleep(0.1)
-		file_name="http://api.github.com/repos/"+user_name+"%s/deployments?per_page=100&page=%d" %(repos,j)
-		repo_deployments = requests.get(file_name, headers=headers)
-		#print repo_deployments, j#if success(200)
-		raw_data=json.loads(repo_deployments.text)
-		page_n=len(raw_data)
-		for k in range(page_n):
-			data.append(raw_data[k])
-
-		j = j+1
+    if write_header:
+        f.writerow(item_keys)
+    f.writerow(item_values)
 
 
-	return data
+def listDeployment(user_name, repos, headers):
+    # request = requests.get("https://api.github.com/repos/twitter/typeahead.js/contributors?per_page=100")
+    # data=json.loads(request.text)
+    # len(data)
+
+    data = []
+
+    page_n = 100
+    j = 1
+
+    while page_n == 100:
+        # a = random.uniform(1,2)
+        time.sleep(0.1)
+        file_name = "http://api.github.com/repos/" + user_name + "%s/deployments?per_page=100&page=%d" % (repos, j)
+        repo_deployments = requests.get(file_name, headers=headers)
+        # print repo_deployments, j#if success(200)
+        raw_data = json.loads(repo_deployments.text)
+        page_n = len(raw_data)
+        for k in range(page_n):
+            data.append(raw_data[k])
+
+        j = j + 1
+
+    return data
 
 
-def writeDeploymentsToCSV(repo,deployments):#write to csv
-	f = csv.writer(open(repo+"/"+repo+"ReposDeployments.csv", "wb+"))
-	item_keys    = []
-	item_values = []
+def writeDeploymentsToCSV(repo, deployments):  # write to csv
+    f = csv.writer(open(repo + "/" + repo + "ReposDeployments.csv", "wb+"))
+    item_keys = []
+    item_values = []
 
-	for i in range (len(deployments)):	
-		singleDeployment=deployments[i]
-		if i == 0:
-			write_header = True
-		else: write_header = False
+    for i in range(len(deployments)):
+        singleDeployment = deployments[i]
+        if i == 0:
+            write_header = True
+        else:
+            write_header = False
 
-		item_values = []
+        item_values = []
 
-		for k , v in singleDeployment.iteritems():
-			#v=convert(v)#convert unicode to str and dict
-		 	
-		 	# if type(v) == type(""):#if it is not a dict
-		 	# 	##print v
-		 	# 	if write_header:
-		 	# 		item_keys.append(k)
-		 	# 	item_values.append(v)
-		 	# else:#it is a dict
+        for k, v in singleDeployment.iteritems():
+            # v=convert(v)#convert unicode to str and dict
 
-		 	# 	##print type(v)
-		 	# 	for innerkey, innervalue in v.iteritems():
-		 	# 		innervalue=convert(innervalue)
-		 	# 		if write_header:
-		 	# 			rowName=k+"/"+innerkey
-		 	# 			item_keys.append(rowName)
-		 	# 		item_values.append(innervalue)
+            # if type(v) == type(""):#if it is not a dict
+            # 	##print v
+            # 	if write_header:
+            # 		item_keys.append(k)
+            # 	item_values.append(v)
+            # else:#it is a dict
 
-		 	if write_header:
-				item_keys.append(k)
-			item_values.append(v)
+            # 	##print type(v)
+            # 	for innerkey, innervalue in v.iteritems():
+            # 		innervalue=convert(innervalue)
+            # 		if write_header:
+            # 			rowName=k+"/"+innerkey
+            # 			item_keys.append(rowName)
+            # 		item_values.append(innervalue)
 
-		if write_header:
-			f.writerow(item_keys)
-		f.writerow(item_values)
+            if write_header:
+                item_keys.append(k)
+            item_values.append(v)
 
-
-def listForks(user_name,repos, headers):
-	#request = requests.get("https://api.github.com/repos/twitter/typeahead.js/contributors?per_page=100")
-	#data=json.loads(request.text)
-	#len(data)	
-
-	data=[]
-
-	page_n=100
-	j=1
-
-	while page_n == 100:
+        if write_header:
+            f.writerow(item_keys)
+        f.writerow(item_values)
 
 
-		#a = random.uniform(1,2)
-		time.sleep(0.1)
+def listForks(user_name, repos, headers):
+    # request = requests.get("https://api.github.com/repos/twitter/typeahead.js/contributors?per_page=100")
+    # data=json.loads(request.text)
+    # len(data)
 
-		file_name="http://api.github.com/repos/"+user_name+"%s/forks?per_page=100&page=%d" %(repos,j)
-		repo_forks = requests.get(file_name, headers=headers)
-		#print repo_forks, j#if success(200)
-		##print repo_comments
-		raw_data=json.loads(repo_forks.text)
-		page_n=len(raw_data)
-		for k in range(page_n):
-			data.append(raw_data[k])
+    data = []
 
-		j = j+1
+    page_n = 100
+    j = 1
 
+    while page_n == 100:
 
-	return data
+        # a = random.uniform(1,2)
+        time.sleep(0.1)
 
-def writeForksToCSV(repo,forks):#write to csv
-	f = csv.writer(open(repo+"/"+repo+"ReposForks.csv", "wb+"))
-	item_keys    = []
-	item_values = []
+        file_name = "http://api.github.com/repos/" + user_name + "%s/forks?per_page=100&page=%d" % (repos, j)
+        repo_forks = requests.get(file_name, headers=headers)
+        # print repo_forks, j#if success(200)
+        ##print repo_comments
+        raw_data = json.loads(repo_forks.text)
+        page_n = len(raw_data)
+        for k in range(page_n):
+            data.append(raw_data[k])
 
-	for i in range (len(forks)):	
-		singleFork=forks[i]
-		if i == 0:
-			write_header = True
-		else: write_header = False
+        j = j + 1
 
-		item_values = []
-
-		for k , v in singleFork.iteritems():
-			#if isinstance(v,basestring) == True:
-				##print v
-				#v = unicodedata.normalize('NFKD',v).encode('ascii', 'ignore')
-				#v=convert(v)#convert unicode to str and dict
-		 	
-		 	if type(v) is not  types.DictType:#if it is not a dict
-		 		##print k,v
-		 		if write_header:
-		 			item_keys.append(k)
-		 		item_values.append(v)
-		 	else:#it is a dict
-
-		 		##print k,v
-		 		for innerkey, innervalue in v.iteritems():
-		 			if type(innervalue) is not types.DictType:
-		 				if write_header:
-		 					rowName=k+"/"+innerkey
-		 					item_keys.append(rowName)	
-		 				item_values.append(innervalue)
-		 			else:
-		 				for innerinnerkey, innerinnervalue in innervalue.iteritems():#invervalue is dict
-							if type(innerinnervalue) is not types.DictType:
-		 						if write_header:
-		 							rowName=k+"/"+innerkey+"/"+innerinnerkey
-		 							item_keys.append(rowName)	
-		 						item_values.append(innerinnervalue)
-		 					else:
-		 						for innerinnerinnerkey, innerinnerinnervalue in innerinnervalue.iteritems():
-		 							if write_header:
-		 								rowName=k+"/"+innerkey+"/"+innerinnerkey+"/"+innerinnerinnerkey
-		 								item_keys.append(rowName)
-		 							item_values.append(innerinnerinnervalue)
+    return data
 
 
+def writeForksToCSV(repo, forks):  # write to csv
+    f = csv.writer(open(repo + "/" + repo + "ReposForks.csv", "wb+"))
+    item_keys = []
+    item_values = []
 
+    for i in range(len(forks)):
+        singleFork = forks[i]
+        if i == 0:
+            write_header = True
+        else:
+            write_header = False
 
-							
+        item_values = []
 
-		if write_header:
-			f.writerow(item_keys)
-		f.writerow(item_values)
+        for k, v in singleFork.iteritems():
+            # if isinstance(v,basestring) == True:
+            ##print v
+            # v = unicodedata.normalize('NFKD',v).encode('ascii', 'ignore')
+            # v=convert(v)#convert unicode to str and dict
 
+            if type(v) is not types.DictType:  # if it is not a dict
+                ##print k,v
+                if write_header:
+                    item_keys.append(k)
+                item_values.append(v)
+            else:  # it is a dict
 
+                ##print k,v
+                for innerkey, innervalue in v.iteritems():
+                    if type(innervalue) is not types.DictType:
+                        if write_header:
+                            rowName = k + "/" + innerkey
+                            item_keys.append(rowName)
+                        item_values.append(innervalue)
+                    else:
+                        for innerinnerkey, innerinnervalue in innervalue.iteritems():  # invervalue is dict
+                            if type(innerinnervalue) is not types.DictType:
+                                if write_header:
+                                    rowName = k + "/" + innerkey + "/" + innerinnerkey
+                                    item_keys.append(rowName)
+                                item_values.append(innerinnervalue)
+                            else:
+                                for innerinnerinnerkey, innerinnerinnervalue in innerinnervalue.iteritems():
+                                    if write_header:
+                                        rowName = k + "/" + innerkey + "/" + innerinnerkey + "/" + innerinnerinnerkey
+                                        item_keys.append(rowName)
+                                    item_values.append(innerinnerinnervalue)
+
+        if write_header:
+            f.writerow(item_keys)
+        f.writerow(item_values)
 
 # def main():
 # 	reload(sys)
 # 	sys.setdefaultencoding("utf-8")
 # 	user_name='twitter/'
 # 	data=Get_data(user_name)
-	
+
 
 
 # 	deployKeys = listDeployKeys(user_name, Repos.get("name"))
@@ -244,8 +233,4 @@ def writeForksToCSV(repo,forks):#write to csv
 
 
 # if __name__=="__main__":
-# 	main()	
-
-
-
-
+# 	main()
